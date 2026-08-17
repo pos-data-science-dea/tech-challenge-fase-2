@@ -1,0 +1,5 @@
+defaultProject: tech-challenge-fase-2-505123
+defaultDataset: bronze
+defaultLocation: US
+defaultAssertionDataset: bronze_assertions
+dataformCoreVersion: 3.0.52

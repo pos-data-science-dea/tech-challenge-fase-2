@@ -1,0 +1,11 @@
+config {
+  type: "table",
+  description: "Base granular de alunos (resultado do indicador no nível do estudante). Camada Bronze: cópia crua da fonte, sem transformações.",
+  tags: ["bronze"]
+}
+
+SELECT
+  *,
+  CURRENT_TIMESTAMP() AS _ingestao_timestamp,
+  'basedosdados.br_inep_avaliacao_alfabetizacao.alunos' AS _fonte
+FROM `basedosdados.br_inep_avaliacao_alfabetizacao.alunos`
