@@ -1,0 +1,11 @@
+config {
+  type: "table",
+  description: "Metas anuais de alfabetização por estado (UF). Camada Bronze: cópia crua da fonte, sem transformações.",
+  tags: ["bronze"]
+}
+
+SELECT
+  *,
+  CURRENT_TIMESTAMP() AS _ingestao_timestamp,
+  'basedosdados.br_inep_avaliacao_alfabetizacao.meta_alfabetizacao_uf' AS _fonte
+FROM `basedosdados.br_inep_avaliacao_alfabetizacao.meta_alfabetizacao_uf`

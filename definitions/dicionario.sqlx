@@ -1,0 +1,11 @@
+config {
+  type: "table",
+  description: "De-para que traduz os códigos das colunas das demais tabelas. Camada Bronze: cópia crua da fonte, sem transformações.",
+  tags: ["bronze"]
+}
+
+SELECT
+  *,
+  CURRENT_TIMESTAMP() AS _ingestao_timestamp,
+  'basedosdados.br_inep_avaliacao_alfabetizacao.dicionario' AS _fonte
+FROM `basedosdados.br_inep_avaliacao_alfabetizacao.dicionario`

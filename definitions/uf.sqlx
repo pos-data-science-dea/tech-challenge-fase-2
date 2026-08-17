@@ -1,0 +1,11 @@
+config {
+  type: "table",
+  description: "Dados e recortes do indicador por unidade da federação (estado). Camada Bronze: cópia crua da fonte, sem transformações.",
+  tags: ["bronze"]
+}
+
+SELECT
+  *,
+  CURRENT_TIMESTAMP() AS _ingestao_timestamp,
+  'basedosdados.br_inep_avaliacao_alfabetizacao.uf' AS _fonte
+FROM `basedosdados.br_inep_avaliacao_alfabetizacao.uf`
