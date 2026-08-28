@@ -39,7 +39,7 @@ def _inteiro_para_booleano(coluna: str) -> Column:
 
 
 def run(spark: SparkSession) -> DataFrame:
-    fq_bronze_aluno = config.fq(config.BRONZE_DATASET, "aluno")
+    fq_bronze_aluno = config.fq(config.BRONZE_DATASET, "alunos")
     fq_silver_aluno = config.fq(config.SILVER_DATASET, "aluno")
 
     df_src_alunos = bigquery_io.read_table(spark, fq_bronze_aluno)
