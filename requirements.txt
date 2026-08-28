@@ -1,0 +1,6 @@
+# Versão do PySpark instalada no ambiente Vertex AI Workbench (micromamba-base-py).
+# TODO: confirmar rodando `python -c "import pyspark; print(pyspark.__version__)"`
+# na instância Workbench antes de fixar a versão para uso local/CI.
+# Em Dataproc Serverless o runtime já provê PySpark; este arquivo serve para
+# desenvolvimento/teste local dos scripts em src/.
+pyspark
