@@ -1,0 +1,67 @@
+# Orquestra o pipeline batch (medalhão) como um Dataproc Serverless Batch.
+# Não há conector nativo de "batches" no Workflows, então chamamos a API REST
+# do Dataproc direto via HTTP (auth OAuth2 = service account do Workflow) e
+# fazemos polling da operação até concluir. Ramifica em caso de falha.
+main:
+  steps:
+    - init:
+        assign:
+          - project: "tech-challenge-fase-2-505123"
+          - region: "us-central1"
+          - bucket: "tech-challenge-fase-2-spark"
+          - batchId: '${"pipeline-" + string(int(sys.now()))}'
+    - createBatch:
+        call: http.post
+        args:
+          url: '${"https://dataproc.googleapis.com/v1/projects/" + project + "/locations/" + region + "/batches?batchId=" + batchId}'
+          auth:
+            type: OAuth2
+          body:
+            runtimeConfig:
+              version: "2.2"
+            environmentConfig:
+              executionConfig:
+                subnetworkUri: "default"
+            pysparkBatch:
+              mainPythonFileUri: '${"gs://" + bucket + "/code/run_pipeline.py"}'
+              pythonFileUris:
+                - '${"gs://" + bucket + "/code/src.zip"}'
+        result: createResp
+    - saveOp:
+        assign:
+          - opName: '${createResp.body.name}'
+    - poll:
+        steps:
+          - wait30:
+              call: sys.sleep
+              args:
+                seconds: 30
+          - getOp:
+              call: http.get
+              args:
+                url: '${"https://dataproc.googleapis.com/v1/" + opName}'
+                auth:
+                  type: OAuth2
+              result: opResp
+          - stillRunning:
+              switch:
+                - condition: '${not("done" in opResp.body)}'
+                  next: poll
+          - checkError:
+              switch:
+                - condition: '${"error" in opResp.body}'
+                  steps:
+                    - logErr:
+                        call: sys.log
+                        args:
+                          severity: "ERROR"
+                          text: '${"Pipeline batch FALHOU: " + batchId}'
+                    - raiseErr:
+                        raise: '${opResp.body.error}'
+    - success:
+        call: sys.log
+        args:
+          severity: "INFO"
+          text: '${"Pipeline batch concluido: " + batchId}'
+    - done:
+        return: '${opResp.body}'
