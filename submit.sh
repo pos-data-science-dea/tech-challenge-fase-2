@@ -23,7 +23,7 @@ case "$MODE" in
     ;;
 esac
  
-# rezipa o estado atual do código (exclui lixo de notebook)
+# rezipa o estado atual do código (exclui checkpoints e cache dos ipynb)
 zip -qr src.zip src -x "*__pycache__*" "*.ipynb_checkpoints*"
  
 gcloud dataproc batches submit pyspark "$MAIN" \

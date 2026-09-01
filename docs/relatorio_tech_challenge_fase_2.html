@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Relatório técnico do Tech Challenge Fase 2: pipeline híbrida para análise da alfabetização no Brasil.">
+  <title>Tech Challenge Fase 2 | Pipeline de Alfabetização</title>
+  <style>
+    :root {
+      --ink: #10233f; --muted: #52647c; --paper: #f5f7fb; --card: #fff;
+      --line: #dbe3ed; --blue: #1d5fd0; --green: #12805c; --gold: #d98513;
+      --violet: #7254cf; --navy: #07172d; --radius: 20px;
+      --shadow: 0 18px 50px rgba(16,35,63,.09);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; color: var(--ink); background: var(--paper); font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; line-height: 1.65; }
+    a { color: inherit; }
+    .wrap { width: min(1160px, calc(100% - 40px)); margin: 0 auto; }
+    .topbar { position: sticky; top: 0; z-index: 10; color: #dceaff; background: rgba(7,23,45,.93); border-bottom: 1px solid rgba(255,255,255,.1); backdrop-filter: blur(14px); }
+    .topbar .wrap { display: flex; align-items: center; gap: 28px; min-height: 64px; }
+    .brand { color: white; font-weight: 800; letter-spacing: -.02em; white-space: nowrap; }
+    .brand span, .eyebrow { color: #5de1e7; }
+    nav { display: flex; gap: 22px; overflow-x: auto; scrollbar-width: none; }
+    nav a { color: #c6d4e7; font-size: .85rem; text-decoration: none; white-space: nowrap; }
+    nav a:hover { color: white; }
+    .hero { position: relative; overflow: hidden; color: white; padding: 96px 0 82px; background: radial-gradient(circle at 78% 18%, rgba(18,168,182,.32), transparent 30%), radial-gradient(circle at 20% 80%, rgba(29,95,208,.3), transparent 34%), var(--navy); }
+    .hero::after { content: ""; position: absolute; inset: 0; opacity: .16; background-image: linear-gradient(rgba(255,255,255,.15) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.15) 1px, transparent 1px); background-size: 42px 42px; mask-image: linear-gradient(to bottom, black, transparent); pointer-events: none; }
+    .hero-grid { position: relative; z-index: 1; display: grid; grid-template-columns: 1.35fr .65fr; gap: 64px; align-items: center; }
+    .eyebrow, .section-kicker { font-size: .76rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+    h1 { max-width: 820px; margin: 14px 0 22px; font-size: clamp(2.65rem,6vw,5.2rem); line-height: .98; letter-spacing: -.055em; }
+    .lead { max-width: 710px; margin: 0; color: #c9d8eb; font-size: clamp(1.05rem,2vw,1.25rem); }
+    .hero-tags { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
+    .hero-tags span { padding: 8px 13px; border: 1px solid rgba(255,255,255,.18); border-radius: 999px; color: #dceaff; background: rgba(255,255,255,.06); font-size: .84rem; }
+    .metric-panel { display: grid; gap: 12px; }
+    .metric { padding: 20px; border: 1px solid rgba(255,255,255,.14); border-radius: 18px; background: rgba(255,255,255,.07); backdrop-filter: blur(10px); }
+    .metric strong { display: block; font-size: 1.9rem; line-height: 1.05; }
+    .metric span { color: #b9cbe1; font-size: .86rem; }
+    main { padding-bottom: 80px; }
+    section { padding-top: 86px; scroll-margin-top: 60px; }
+    .section-kicker { margin-bottom: 8px; color: var(--blue); }
+    h2 { margin: 0 0 18px; font-size: clamp(2rem,4vw,3.1rem); line-height: 1.08; letter-spacing: -.04em; }
+    h3 { margin: 0 0 10px; font-size: 1.12rem; line-height: 1.3; }
+    .section-intro { max-width: 820px; margin: 0 0 34px; color: var(--muted); font-size: 1.05rem; }
+    .callout { display: grid; grid-template-columns: 120px 1fr; gap: 28px; padding: 30px; border: 1px solid #cddbf0; border-radius: var(--radius); background: linear-gradient(135deg,#eaf3ff,white); box-shadow: var(--shadow); }
+    .callout .number { color: var(--blue); font-size: 3.8rem; font-weight: 900; line-height: .95; letter-spacing: -.06em; }
+    .callout p, .card p { margin: 0; color: var(--muted); }
+    .architecture { padding: 28px; border-radius: 26px; background: var(--navy); box-shadow: var(--shadow); }
+    .arch-flow { display: grid; grid-template-columns: repeat(7,minmax(100px,1fr)); gap: 10px; align-items: stretch; }
+    .node { position: relative; display: grid; align-content: center; min-height: 110px; padding: 16px 12px; border: 1px solid rgba(255,255,255,.13); border-radius: 14px; color: #dceaff; text-align: center; background: rgba(255,255,255,.06); }
+    .node strong { color: white; font-size: .92rem; }
+    .node small { display: block; margin-top: 4px; color: #9fb4ce; font-size: .72rem; }
+    .node:not(:last-child)::after { content: "→"; position: absolute; z-index: 2; right: -17px; top: 42%; color: #55dce4; font-weight: 900; }
+    .node.bronze { border-top: 4px solid #c97838; } .node.silver { border-top: 4px solid #9db2c6; } .node.gold { border-top: 4px solid #e0a62d; }
+    .arch-caption { display: flex; justify-content: space-between; gap: 20px; margin-top: 16px; color: #93a9c4; font-size: .78rem; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 18px; }
+    .grid-2 { display: grid; grid-template-columns: repeat(2,1fr); gap: 18px; }
+    .card { padding: 26px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--card); box-shadow: 0 10px 30px rgba(16,35,63,.05); }
+    .layer { border-top: 5px solid; } .layer.bronze { border-color: #b76b34; } .layer.silver { border-color: #8297aa; } .layer.gold { border-color: var(--gold); }
+    .layer .label { display: inline-block; margin-bottom: 12px; font-size: .72rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+    .compact { margin: 15px 0 0; padding-left: 19px; color: var(--muted); } .compact li + li { margin-top: 6px; }
+    .swimlanes { display: grid; gap: 18px; }
+    .lane { display: grid; grid-template-columns: 150px 1fr; gap: 20px; align-items: center; padding: 22px; border: 1px solid var(--line); border-radius: var(--radius); background: white; }
+    .lane-title strong { display: block; } .lane-title span { color: var(--muted); font-size: .8rem; }
+    .steps { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; }
+    .step { min-height: 92px; padding: 14px; border-radius: 12px; background: #f0f4f9; font-size: .82rem; }
+    .step b { display: block; margin-bottom: 4px; color: var(--blue); }
+    table { width: 100%; border-collapse: collapse; overflow: hidden; border: 1px solid var(--line); border-radius: 16px; background: white; box-shadow: 0 10px 30px rgba(16,35,63,.04); }
+    th, td { padding: 15px 17px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+    th { background: #edf3fa; font-size: .78rem; letter-spacing: .04em; text-transform: uppercase; }
+    td { color: var(--muted); font-size: .9rem; } td:first-child { color: var(--ink); font-weight: 700; } tr:last-child td { border-bottom: 0; }
+    code { padding: .15em .38em; border-radius: 5px; color: #17447e; background: #eaf1fa; font-family: "SFMono-Regular",Consolas,monospace; font-size: .88em; }
+    .quality-card { position: relative; padding-left: 62px; }
+    .quality-card::before { content: "✓"; position: absolute; left: 24px; top: 24px; display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; color: white; background: var(--green); font-weight: 900; }
+    .tradeoff { border-left: 5px solid var(--violet); }
+    .status { display: inline-flex; align-items: center; gap: 7px; margin-top: 14px; padding: 5px 9px; border-radius: 999px; color: #096044; background: #dff6ed; font-size: .75rem; font-weight: 800; }
+    .status::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: #16a273; }
+    .status.next { color: #87510a; background: #fff0d3; } .status.next::before { background: #db8a17; }
+    .finops { color: white; background: linear-gradient(135deg,#0b2b35,#0b4a4a); border: 0; }
+    .finops p { color: #c8e6e3; } .finops h3 { color: white; } .finops .big { margin-bottom: 10px; color: #6ce1d4; font-size: 2.5rem; font-weight: 900; letter-spacing: -.05em; }
+    .use-case { min-height: 190px; } .use-case .index { color: var(--blue); font-size: .75rem; font-weight: 900; letter-spacing: .12em; }
+    .repo-tree { overflow-x: auto; padding: 28px; border-radius: var(--radius); color: #cfe0f4; background: var(--navy); box-shadow: var(--shadow); }
+    .repo-tree pre { margin: 0; font: .87rem/1.75 "SFMono-Regular",Consolas,monospace; }
+    .note { margin-top: 24px; padding: 22px 24px; border-left: 5px solid var(--gold); border-radius: 0 14px 14px 0; color: #66470e; background: #fff5df; }
+    .fact-tabs { border: 1px solid var(--line); border-radius: 24px; background: white; box-shadow: var(--shadow); overflow: hidden; }
+    .tab-list { display: flex; gap: 8px; overflow-x: auto; padding: 14px; border-bottom: 1px solid var(--line); background: #edf3fa; scrollbar-width: thin; }
+    .tab-button { flex: 0 0 auto; padding: 10px 15px; border: 1px solid #cad7e7; border-radius: 10px; color: #40556f; background: white; font: inherit; font-size: .82rem; font-weight: 800; cursor: pointer; }
+    .tab-button:hover { border-color: var(--blue); color: var(--blue); }
+    .tab-button[aria-selected="true"] { border-color: var(--blue); color: white; background: var(--blue); box-shadow: 0 7px 18px rgba(29,95,208,.22); }
+    .tab-button:focus-visible { outline: 3px solid rgba(29,95,208,.3); outline-offset: 2px; }
+    .fact-panel { padding: 26px; }
+    .fact-panel[hidden] { display: none; }
+    .fact-summary { display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: start; margin-bottom: 20px; }
+    .fact-summary h3 { margin-bottom: 5px; font-size: 1.35rem; }
+    .fact-summary p { max-width: 750px; margin: 0; color: var(--muted); }
+    .grain-badge { padding: 7px 11px; border-radius: 999px; color: #744c06; background: #fff0d3; font-size: .75rem; font-weight: 800; white-space: nowrap; }
+    .fact-diagram { overflow-x: auto; padding: 18px; border-radius: 18px; background: var(--navy); }
+    .fact-diagram svg { display: block; min-width: 850px; width: 100%; height: auto; }
+    .schema-legend { display: flex; flex-wrap: wrap; gap: 10px; margin: 16px 0 0; }
+    .schema-legend span { padding: 6px 10px; border-radius: 999px; color: #52647c; background: #edf3fa; font-size: .75rem; }
+    .relation-caption { margin: 14px 2px 0; color: var(--muted); font-size: .84rem; }
+    .key { display: inline-block; min-width: 28px; margin-right: 5px; padding: 2px 5px; border-radius: 4px; color: white; background: var(--blue); font-size: .68rem; font-weight: 900; text-align: center; }
+    .key.fk { background: var(--violet); }
+    .key.nk { background: var(--green); }
+    .practice-list { counter-reset: practice; display: grid; grid-template-columns: repeat(2,1fr); gap: 14px; margin: 24px 0 0; padding: 0; list-style: none; }
+    .practice-list li { position: relative; min-height: 112px; padding: 20px 20px 20px 58px; border: 1px solid var(--line); border-radius: 16px; color: var(--muted); background: white; }
+    .practice-list li::before { counter-increment: practice; content: counter(practice); position: absolute; left: 20px; top: 20px; display: grid; place-items: center; width: 26px; height: 26px; border-radius: 8px; color: white; background: var(--blue); font-size: .76rem; font-weight: 900; }
+    .practice-list strong { display: block; margin-bottom: 4px; color: var(--ink); }
+    footer { padding: 34px 0; color: #9eb0c6; background: var(--navy); } footer .wrap { display: flex; justify-content: space-between; gap: 20px; } footer strong { color: white; }
+    @media (max-width:900px) { .hero-grid,.grid-3,.grid-2 { grid-template-columns: 1fr; } .metric-panel { grid-template-columns: repeat(3,1fr); } .arch-flow { grid-template-columns: 1fr; } .node:not(:last-child)::after { content: "↓"; right: 50%; top: auto; bottom: -20px; } .lane { grid-template-columns: 1fr; } .steps,.practice-list { grid-template-columns: repeat(2,1fr); } .fact-summary { grid-template-columns: 1fr; } }
+    @media (max-width:620px) { .wrap { width: min(100% - 24px,1160px); } .topbar .wrap { display: block; padding: 12px 0; } nav { margin-top: 8px; } .hero { padding: 70px 0 58px; } .metric-panel,.callout,.steps,.practice-list { grid-template-columns: 1fr; } section { padding-top: 64px; } th,td { padding: 12px; } footer .wrap { flex-direction: column; } }
+    @media print { .topbar { display: none; } body { background: white; } .hero { padding: 48px 0; print-color-adjust: exact; -webkit-print-color-adjust: exact; } section { padding-top: 45px; break-inside: avoid; } .card,table,.architecture,.repo-tree { box-shadow: none; break-inside: avoid; } }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap"><div class="brand">FIAP <span>/ Fase 2</span></div><nav aria-label="Navegação principal"><a href="#contexto">Contexto</a><a href="#arquitetura">Arquitetura</a><a href="#camadas">Camadas</a><a href="#modelo">Star schema</a><a href="#qualidade">Qualidade</a><a href="#finops">FinOps</a><a href="#ia">Aplicações em IA</a><a href="#entrega">Entrega</a></nav></div>
+  </header>
+  <header class="hero">
+    <div class="wrap hero-grid">
+      <div><div class="eyebrow">Tech Challenge · Engenharia de Dados</div><h1>Dados que ajudam o Brasil a alfabetizar.</h1><p class="lead">Uma pipeline híbrida, escalável e orientada à qualidade para transformar dados públicos educacionais em indicadores comparáveis, metas acompanháveis e decisões baseadas em evidências.</p><div class="hero-tags" aria-label="Tecnologias principais"><span>Google Cloud</span><span>BigQuery</span><span>Dataform</span><span>PySpark</span><span>Dataproc</span><span>Pub/Sub</span></div></div>
+      <aside class="metric-panel" aria-label="Resumo da solução"><div class="metric"><strong>3</strong><span>camadas na Arquitetura Medalhão</span></div><div class="metric"><strong>15</strong><span>transformações batch Silver + Gold</span></div><div class="metric"><strong>2</strong><span>caminhos de ingestão: batch e streaming</span></div></aside>
+    </div>
+  </header>
+  <main>
+    <section id="contexto"><div class="wrap"><div class="section-kicker">01 · Contexto</div><h2>O desafio educacional</h2><p class="section-intro">O Compromisso Nacional Criança Alfabetizada mobiliza União, estados e municípios para garantir a alfabetização ao final do 2º ano do ensino fundamental. Medir o avanço exige integrar alunos, territórios, redes de ensino, resultados e metas.</p><div class="callout"><div class="number">743</div><div><h3>O ponto de corte da alfabetização</h3><p>A Pesquisa Alfabetiza Brasil definiu 743 pontos na escala de proficiência do Saeb como o patamar a partir do qual uma criança pode ser considerada alfabetizada. A meta nacional estabelece o horizonte de 2030 para alcançar todas as crianças.</p></div></div></div></section>
+
+    <section id="arquitetura"><div class="wrap"><div class="section-kicker">02 · Solução</div><h2>Uma arquitetura híbrida na GCP</h2><p class="section-intro">O histórico segue um fluxo batch governado e reprodutível. Novas medições simuladas percorrem um caminho streaming de baixa latência. Ambos convergem no BigQuery e alimentam consumo analítico.</p>
+      <div class="architecture" role="img" aria-label="Fluxo da Base dos Dados até consumidores analíticos pelas camadas Bronze, Silver e Gold"><div class="arch-flow"><div class="node"><strong>Base dos Dados</strong><small>fontes educacionais</small></div><div class="node"><strong>Dataform</strong><small>ingestão declarativa</small></div><div class="node bronze"><strong>Bronze</strong><small>BigQuery · dados brutos</small></div><div class="node"><strong>Dataproc</strong><small>PySpark serverless</small></div><div class="node silver"><strong>Silver</strong><small>tipada e validada</small></div><div class="node gold"><strong>Gold</strong><small>dimensões e fatos</small></div><div class="node"><strong>Consumo</strong><small>BI · análises · IA</small></div></div><div class="arch-caption"><span>Cloud Scheduler → Workflows orquestra o batch diário</span><span>Pub/Sub → BigQuery Views atende o streaming</span></div></div>
+      <div class="swimlanes" style="margin-top:24px"><div class="lane"><div class="lane-title"><strong>Batch</strong><span>histórico e metas</span></div><div class="steps"><div class="step"><b>1 · Ingerir</b>SQLX copia sete fontes e registra origem e horário.</div><div class="step"><b>2 · Tratar</b>PySpark normaliza chaves, tipos, textos e domínios.</div><div class="step"><b>3 · Modelar</b>Nove tabelas Gold organizam dimensões, fatos e gaps.</div><div class="step"><b>4 · Orquestrar</b>Workflow acompanha o batch até sucesso ou falha.</div></div></div><div class="lane"><div class="lane-title"><strong>Streaming</strong><span>novas medições</span></div><div class="steps"><div class="step"><b>1 · Produzir</b>Python gera eventos JSON de alfabetização.</div><div class="step"><b>2 · Transportar</b>Pub/Sub desacopla produtor e destino.</div><div class="step"><b>3 · Interpretar</b>View Silver tipa e normaliza cada mensagem.</div><div class="step"><b>4 · Servir</b>View Gold expõe a medição mais recente.</div></div></div></div>
+    </div></section>
+
+    <section id="camadas"><div class="wrap"><div class="section-kicker">03 · Arquitetura Medalhão</div><h2>Do dado bruto à decisão</h2><p class="section-intro">Cada camada tem um contrato claro. Separar ingestão, tratamento e consumo reduz acoplamento, melhora a rastreabilidade e permite reprocessar a solução com segurança.</p>
+      <div class="grid-3"><article class="card layer bronze"><div class="label">Bronze · Raw</div><h3>Preservar a origem</h3><p>Sete definições Dataform copiam alunos, indicadores, metas e dicionário para o BigQuery.</p><ul class="compact"><li>sem transformação significativa</li><li><code>_fonte</code> e <code>_ingestao_timestamp</code></li><li>ponto de reprocessamento</li></ul></article><article class="card layer silver"><div class="label">Silver · Trusted</div><h3>Garantir consistência</h3><p>Seis pipelines PySpark limpam, tipam, validam e deduplicam as entidades usadas em análise.</p><ul class="compact"><li>chaves IBGE normalizadas</li><li>domínios e percentuais validados</li><li>timestamp de promoção</li></ul></article><article class="card layer gold"><div class="label">Gold · Analytics</div><h3>Responder perguntas</h3><p>Nove dimensões e fatos comparam resultados observados às metas anuais e ao horizonte de 2030.</p><ul class="compact"><li>níveis aluno, município e UF</li><li>metas em formato analítico</li><li>gaps e indicador de atingimento</li></ul></article></div>
+      <div style="margin-top:34px;overflow-x:auto"><table><thead><tr><th>Conjunto Gold</th><th>Entregas</th><th>Valor analítico</th></tr></thead><tbody><tr><td>Dimensões</td><td><code>dim_tempo</code>, <code>dim_uf</code>, <code>dim_municipio</code>, <code>dim_rede</code></td><td>Filtros temporais, geográficos e por rede com nomenclatura consistente.</td></tr><tr><td>Indicadores</td><td><code>fato_aluno</code>, <code>fato_indicador_municipio</code>, <code>fato_indicador_uf</code></td><td>Análise granular e agregada da proficiência e da taxa de alfabetização.</td></tr><tr><td>Metas</td><td><code>fato_meta</code></td><td>Metas de 2024 a 2030 despivotadas para Brasil, UF e município.</td></tr><tr><td>Resultados</td><td><code>fato_resultados</code></td><td>Meta do ano, meta de 2030, gaps e status de atingimento por município e rede.</td></tr></tbody></table></div>
+    </div></section>
+
+    <section id="modelo"><div class="wrap"><div class="section-kicker">04 · Modelagem dimensional</div><h2>Star schema e relações entre tabelas</h2><p class="section-intro">Como a Gold contém fatos em granularidades diferentes, o desenho completo é uma <strong>constelação de fatos</strong>. Selecione uma aba para visualizar o star schema de cada fato, seu grão, suas chaves e as dimensões relacionadas.</p>
+      <div class="fact-tabs" data-fact-tabs>
+        <div class="tab-list" role="tablist" aria-label="Star schemas por tabela fato">
+          <button class="tab-button" id="tab-aluno" type="button" role="tab" aria-selected="true" aria-controls="panel-aluno" tabindex="0">fato_aluno</button>
+          <button class="tab-button" id="tab-ind-mun" type="button" role="tab" aria-selected="false" aria-controls="panel-ind-mun" tabindex="-1">fato_indicador_municipio</button>
+          <button class="tab-button" id="tab-ind-uf" type="button" role="tab" aria-selected="false" aria-controls="panel-ind-uf" tabindex="-1">fato_indicador_uf</button>
+          <button class="tab-button" id="tab-meta" type="button" role="tab" aria-selected="false" aria-controls="panel-meta" tabindex="-1">fato_meta</button>
+          <button class="tab-button" id="tab-resultados" type="button" role="tab" aria-selected="false" aria-controls="panel-resultados" tabindex="-1">fato_resultados</button>
+        </div>
+
+        <article class="fact-panel" id="panel-aluno" role="tabpanel" aria-labelledby="tab-aluno">
+          <div class="fact-summary"><div><h3>Star schema · fato_aluno</h3><p>Microdado da avaliação. <code>id_aluno</code> e <code>id_escola</code> são dimensões degeneradas armazenadas diretamente na fato.</p></div><span class="grain-badge">Grão: aluno × ano</span></div>
+          <div class="fact-diagram"><svg viewBox="0 0 1000 560" role="img" aria-label="Star schema da fato aluno com as dimensões tempo, município e rede">
+            <defs><marker id="arrow-aluno" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#7bdce5"/></marker></defs>
+            <g fill="none" stroke="#7bdce5" stroke-width="3" marker-end="url(#arrow-aluno)"><path d="M500 140V205"/><path d="M295 305H340"/><path d="M705 305H660"/></g>
+            <g font-family="Inter,Segoe UI,sans-serif"><g><rect x="360" y="20" width="280" height="120" rx="15" fill="#103653" stroke="#5de1e7" stroke-width="3"/><text x="385" y="55" fill="#fff" font-size="21" font-weight="800">dim_tempo</text><text x="385" y="88" fill="#5de1e7" font-size="14" font-weight="800">PK ano</text><text x="385" y="113" fill="#bfd1e6" font-size="14">tipo_ano</text></g><g><rect x="20" y="235" width="275" height="145" rx="15" fill="#103653" stroke="#62d99b" stroke-width="3"/><text x="45" y="270" fill="#fff" font-size="20" font-weight="800">dim_municipio</text><text x="45" y="303" fill="#62d99b" font-size="14" font-weight="800">PK id_municipio</text><text x="45" y="331" fill="#bfd1e6" font-size="14">nome · UF · região</text></g><g><rect x="705" y="235" width="275" height="145" rx="15" fill="#103653" stroke="#ffd36d" stroke-width="3"/><text x="730" y="270" fill="#fff" font-size="20" font-weight="800">dim_rede</text><text x="730" y="303" fill="#ffd36d" font-size="14" font-weight="800">PK rede_id</text><text x="730" y="331" fill="#bfd1e6" font-size="14">rede</text></g><g><rect x="340" y="205" width="320" height="290" rx="18" fill="#173f77" stroke="#e0a62d" stroke-width="4"/><text x="365" y="244" fill="#ffd36d" font-size="23" font-weight="900">fato_aluno</text><text x="365" y="281" fill="#5de1e7" font-size="14" font-weight="800">FK ano</text><text x="365" y="310" fill="#62d99b" font-size="14" font-weight="800">FK id_municipio</text><text x="365" y="339" fill="#ffd36d" font-size="14" font-weight="800">FK rede_id</text><text x="365" y="368" fill="#fff" font-size="14" font-weight="800">NK id_aluno</text><line x1="365" y1="388" x2="635" y2="388" stroke="#58769e"/><text x="365" y="418" fill="#bfd1e6" font-size="14">id_escola · serie · caderno</text><text x="365" y="445" fill="#bfd1e6" font-size="14">proficiencia · peso_aluno</text><text x="365" y="472" fill="#bfd1e6" font-size="14">presença · preenchimento · alfabetizado</text></g><text x="485" y="177" fill="#9fb4ce" font-size="12">1 : N</text><text x="302" y="294" fill="#9fb4ce" font-size="12">1 : N</text><text x="665" y="294" fill="#9fb4ce" font-size="12">N : 1</text></g>
+          </svg></div>
+          <div class="schema-legend"><span><b>PK:</b> ano, id_municipio, rede_id</span><span><b>FKs na fato:</b> ano, id_municipio, rede_id</span><span><b>Chave de negócio:</b> (ano, id_aluno)</span></div>
+        </article>
+
+        <article class="fact-panel" id="panel-ind-mun" role="tabpanel" aria-labelledby="tab-ind-mun" hidden>
+          <div class="fact-summary"><div><h3>Star schema · fato_indicador_municipio</h3><p>Indicadores agregados de alfabetização no nível municipal, relacionados às dimensões conformadas de tempo, município e rede.</p></div><span class="grain-badge">Grão: ano × município × rede × série</span></div>
+          <div class="fact-diagram"><svg viewBox="0 0 1000 560" role="img" aria-label="Star schema do indicador municipal com as dimensões tempo, município e rede">
+            <defs><marker id="arrow-mun" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#7bdce5"/></marker></defs><g fill="none" stroke="#7bdce5" stroke-width="3" marker-end="url(#arrow-mun)"><path d="M500 140V205"/><path d="M295 305H340"/><path d="M705 305H660"/></g>
+            <g font-family="Inter,Segoe UI,sans-serif"><g><rect x="360" y="20" width="280" height="120" rx="15" fill="#103653" stroke="#5de1e7" stroke-width="3"/><text x="385" y="55" fill="#fff" font-size="21" font-weight="800">dim_tempo</text><text x="385" y="88" fill="#5de1e7" font-size="14" font-weight="800">PK ano</text></g><g><rect x="20" y="235" width="275" height="145" rx="15" fill="#103653" stroke="#62d99b" stroke-width="3"/><text x="45" y="270" fill="#fff" font-size="20" font-weight="800">dim_municipio</text><text x="45" y="303" fill="#62d99b" font-size="14" font-weight="800">PK id_municipio</text><text x="45" y="331" fill="#bfd1e6" font-size="14">nome · UF · região</text></g><g><rect x="705" y="235" width="275" height="145" rx="15" fill="#103653" stroke="#ffd36d" stroke-width="3"/><text x="730" y="270" fill="#fff" font-size="20" font-weight="800">dim_rede</text><text x="730" y="303" fill="#ffd36d" font-size="14" font-weight="800">PK rede_id</text><text x="730" y="331" fill="#bfd1e6" font-size="14">rede</text></g><g><rect x="340" y="205" width="320" height="290" rx="18" fill="#173f77" stroke="#e0a62d" stroke-width="4"/><text x="360" y="244" fill="#ffd36d" font-size="19" font-weight="900">fato_indicador_municipio</text><text x="365" y="281" fill="#5de1e7" font-size="14" font-weight="800">FK ano</text><text x="365" y="310" fill="#62d99b" font-size="14" font-weight="800">FK id_municipio</text><text x="365" y="339" fill="#ffd36d" font-size="14" font-weight="800">FK rede_id</text><text x="365" y="368" fill="#fff" font-size="14">serie</text><line x1="365" y1="388" x2="635" y2="388" stroke="#58769e"/><text x="365" y="418" fill="#bfd1e6" font-size="14">taxa_alfabetizacao</text><text x="365" y="445" fill="#bfd1e6" font-size="14">media_portugues</text><text x="365" y="472" fill="#bfd1e6" font-size="14">proporcao_aluno_nivel_0…8</text></g><text x="485" y="177" fill="#9fb4ce" font-size="12">1 : N</text><text x="302" y="294" fill="#9fb4ce" font-size="12">1 : N</text><text x="665" y="294" fill="#9fb4ce" font-size="12">N : 1</text></g>
+          </svg></div>
+          <div class="schema-legend"><span><b>FKs:</b> ano, id_municipio, rede_id</span><span><b>Chave de negócio:</b> (ano, id_municipio, rede_id, serie)</span></div>
+        </article>
+
+        <article class="fact-panel" id="panel-ind-uf" role="tabpanel" aria-labelledby="tab-ind-uf" hidden>
+          <div class="fact-summary"><div><h3>Star schema · fato_indicador_uf</h3><p>Indicadores agregados no nível estadual. A dimensão geográfica relacionada é <code>dim_uf</code>, não <code>dim_municipio</code>.</p></div><span class="grain-badge">Grão: ano × UF × rede × série</span></div>
+          <div class="fact-diagram"><svg viewBox="0 0 1000 560" role="img" aria-label="Star schema do indicador estadual com as dimensões tempo, UF e rede">
+            <defs><marker id="arrow-uf" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#7bdce5"/></marker></defs><g fill="none" stroke="#7bdce5" stroke-width="3" marker-end="url(#arrow-uf)"><path d="M500 140V205"/><path d="M295 305H340"/><path d="M705 305H660"/></g>
+            <g font-family="Inter,Segoe UI,sans-serif"><g><rect x="360" y="20" width="280" height="120" rx="15" fill="#103653" stroke="#5de1e7" stroke-width="3"/><text x="385" y="55" fill="#fff" font-size="21" font-weight="800">dim_tempo</text><text x="385" y="88" fill="#5de1e7" font-size="14" font-weight="800">PK ano</text></g><g><rect x="20" y="235" width="275" height="145" rx="15" fill="#103653" stroke="#a995f5" stroke-width="3"/><text x="45" y="270" fill="#fff" font-size="20" font-weight="800">dim_uf</text><text x="45" y="303" fill="#a995f5" font-size="14" font-weight="800">PK sigla_uf</text><text x="45" y="331" fill="#bfd1e6" font-size="14">nome_uf · nome_regiao</text></g><g><rect x="705" y="235" width="275" height="145" rx="15" fill="#103653" stroke="#ffd36d" stroke-width="3"/><text x="730" y="270" fill="#fff" font-size="20" font-weight="800">dim_rede</text><text x="730" y="303" fill="#ffd36d" font-size="14" font-weight="800">PK rede_id</text><text x="730" y="331" fill="#bfd1e6" font-size="14">rede</text></g><g><rect x="340" y="205" width="320" height="290" rx="18" fill="#173f77" stroke="#e0a62d" stroke-width="4"/><text x="365" y="244" fill="#ffd36d" font-size="20" font-weight="900">fato_indicador_uf</text><text x="365" y="281" fill="#5de1e7" font-size="14" font-weight="800">FK ano</text><text x="365" y="310" fill="#a995f5" font-size="14" font-weight="800">FK sigla_uf</text><text x="365" y="339" fill="#ffd36d" font-size="14" font-weight="800">FK rede_id</text><text x="365" y="368" fill="#fff" font-size="14">serie</text><line x1="365" y1="388" x2="635" y2="388" stroke="#58769e"/><text x="365" y="418" fill="#bfd1e6" font-size="14">taxa_alfabetizacao</text><text x="365" y="445" fill="#bfd1e6" font-size="14">media_portugues</text><text x="365" y="472" fill="#bfd1e6" font-size="14">proporcao_aluno_nivel_0…8</text></g><text x="485" y="177" fill="#9fb4ce" font-size="12">1 : N</text><text x="302" y="294" fill="#9fb4ce" font-size="12">1 : N</text><text x="665" y="294" fill="#9fb4ce" font-size="12">N : 1</text></g>
+          </svg></div>
+          <div class="schema-legend"><span><b>FKs:</b> ano, sigla_uf, rede_id</span><span><b>Chave de negócio:</b> (ano, sigla_uf, rede_id, serie)</span></div>
+        </article>
+
+        <article class="fact-panel" id="panel-meta" role="tabpanel" aria-labelledby="tab-meta" hidden>
+          <div class="fact-summary"><div><h3>Star schema · fato_meta</h3><p><code>dim_tempo</code> participa duas vezes: ano de referência e ano-alvo. <code>local_id</code> aponta para município ou UF conforme <code>nivel_geografico</code>; no nível Brasil ele é nulo.</p></div><span class="grain-badge">Grão: nível × local × rede × referência × alvo</span></div>
+          <div class="fact-diagram"><svg viewBox="0 0 1100 620" role="img" aria-label="Star schema da fato meta com tempo em dois papéis, rede e localidades municipal ou estadual">
+            <defs><marker id="arrow-meta" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#7bdce5"/></marker></defs><g fill="none" stroke-width="3" marker-end="url(#arrow-meta)"><path d="M520 135V205" stroke="#5de1e7"/><path d="M580 135V205" stroke="#5de1e7"/><path d="M295 275H365" stroke="#62d99b" stroke-dasharray="8 6"/><path d="M295 470L365 420" stroke="#a995f5" stroke-dasharray="8 6"/><path d="M805 315H735" stroke="#ffd36d"/></g>
+            <g font-family="Inter,Segoe UI,sans-serif"><g><rect x="410" y="20" width="280" height="115" rx="15" fill="#103653" stroke="#5de1e7" stroke-width="3"/><text x="435" y="55" fill="#fff" font-size="21" font-weight="800">dim_tempo</text><text x="435" y="88" fill="#5de1e7" font-size="14" font-weight="800">PK ano</text><text x="445" y="170" fill="#9fb4ce" font-size="12">ano_referencia</text><text x="575" y="170" fill="#9fb4ce" font-size="12">ano_meta</text></g><g><rect x="20" y="205" width="275" height="140" rx="15" fill="#103653" stroke="#62d99b" stroke-width="3"/><text x="45" y="240" fill="#fff" font-size="20" font-weight="800">dim_municipio</text><text x="45" y="273" fill="#62d99b" font-size="14" font-weight="800">PK id_municipio</text><text x="45" y="304" fill="#bfd1e6" font-size="13">quando nível = municipio</text></g><g><rect x="20" y="400" width="275" height="140" rx="15" fill="#103653" stroke="#a995f5" stroke-width="3"/><text x="45" y="435" fill="#fff" font-size="20" font-weight="800">dim_uf</text><text x="45" y="468" fill="#a995f5" font-size="14" font-weight="800">PK sigla_uf</text><text x="45" y="499" fill="#bfd1e6" font-size="13">quando nível = uf</text></g><g><rect x="805" y="245" width="275" height="140" rx="15" fill="#103653" stroke="#ffd36d" stroke-width="3"/><text x="830" y="280" fill="#fff" font-size="20" font-weight="800">dim_rede</text><text x="830" y="313" fill="#ffd36d" font-size="14" font-weight="800">PK rede_id</text><text x="830" y="344" fill="#bfd1e6" font-size="14">rede</text></g><g><rect x="365" y="205" width="370" height="340" rx="18" fill="#173f77" stroke="#e0a62d" stroke-width="4"/><text x="390" y="245" fill="#ffd36d" font-size="23" font-weight="900">fato_meta</text><text x="390" y="285" fill="#5de1e7" font-size="14" font-weight="800">FK ano_referencia</text><text x="390" y="314" fill="#5de1e7" font-size="14" font-weight="800">FK ano_meta</text><text x="390" y="343" fill="#ffd36d" font-size="14" font-weight="800">FK rede_id</text><text x="390" y="372" fill="#62d99b" font-size="14" font-weight="800">local_id → município</text><text x="390" y="401" fill="#a995f5" font-size="14" font-weight="800">local_id → UF</text><text x="390" y="430" fill="#fff" font-size="14">nivel_geografico</text><line x1="390" y1="451" x2="710" y2="451" stroke="#58769e"/><text x="390" y="481" fill="#bfd1e6" font-size="14">valor_meta</text><text x="390" y="510" fill="#bfd1e6" font-size="13">Brasil: local_id = NULL</text></g></g>
+          </svg></div>
+          <div class="schema-legend"><span><b>Tempo:</b> duas relações 1:N</span><span><b>Localidade:</b> relação condicional pelo nível</span><span><b>Chave:</b> (nível, local, rede, referência, alvo)</span></div>
+          <p class="relation-caption">As linhas tracejadas representam os dois domínios possíveis de <code>local_id</code>. Apenas uma dessas relações se aplica a cada registro.</p>
+        </article>
+
+        <article class="fact-panel" id="panel-resultados" role="tabpanel" aria-labelledby="tab-resultados" hidden>
+          <div class="fact-summary"><div><h3>Star schema · fato_resultados</h3><p>Mart municipal de serving com resultados, metas e gaps. Os nomes territoriais e da rede já estão desnormalizados na tabela, mas as chaves continuam permitindo o relacionamento dimensional.</p></div><span class="grain-badge">Grão atual: ano × município × rede</span></div>
+          <div class="fact-diagram"><svg viewBox="0 0 1000 560" role="img" aria-label="Star schema da fato resultados com as dimensões tempo, município e rede">
+            <defs><marker id="arrow-result" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#7bdce5"/></marker></defs><g fill="none" stroke="#7bdce5" stroke-width="3" marker-end="url(#arrow-result)"><path d="M500 140V205"/><path d="M295 305H340"/><path d="M705 305H660"/></g>
+            <g font-family="Inter,Segoe UI,sans-serif"><g><rect x="360" y="20" width="280" height="120" rx="15" fill="#103653" stroke="#5de1e7" stroke-width="3"/><text x="385" y="55" fill="#fff" font-size="21" font-weight="800">dim_tempo</text><text x="385" y="88" fill="#5de1e7" font-size="14" font-weight="800">PK ano</text></g><g><rect x="20" y="235" width="275" height="145" rx="15" fill="#103653" stroke="#62d99b" stroke-width="3"/><text x="45" y="270" fill="#fff" font-size="20" font-weight="800">dim_municipio</text><text x="45" y="303" fill="#62d99b" font-size="14" font-weight="800">PK id_municipio</text><text x="45" y="331" fill="#bfd1e6" font-size="14">nome · UF · região</text></g><g><rect x="705" y="235" width="275" height="145" rx="15" fill="#103653" stroke="#ffd36d" stroke-width="3"/><text x="730" y="270" fill="#fff" font-size="20" font-weight="800">dim_rede</text><text x="730" y="303" fill="#ffd36d" font-size="14" font-weight="800">PK rede_id</text><text x="730" y="331" fill="#bfd1e6" font-size="14">rede</text></g><g><rect x="340" y="205" width="320" height="300" rx="18" fill="#173f77" stroke="#e0a62d" stroke-width="4"/><text x="365" y="244" fill="#ffd36d" font-size="22" font-weight="900">fato_resultados</text><text x="365" y="281" fill="#5de1e7" font-size="14" font-weight="800">FK ano</text><text x="365" y="310" fill="#62d99b" font-size="14" font-weight="800">FK id_municipio</text><text x="365" y="339" fill="#ffd36d" font-size="14" font-weight="800">FK rede_id</text><line x1="365" y1="363" x2="635" y2="363" stroke="#58769e"/><text x="365" y="393" fill="#bfd1e6" font-size="14">taxa · média · meta_ano</text><text x="365" y="421" fill="#bfd1e6" font-size="14">gap_meta_ano · atingiu_meta</text><text x="365" y="449" fill="#bfd1e6" font-size="14">meta_2030 · gap_ate_2030</text><text x="365" y="477" fill="#9fb4ce" font-size="12">atributos territoriais desnormalizados</text></g><text x="485" y="177" fill="#9fb4ce" font-size="12">1 : N</text><text x="302" y="294" fill="#9fb4ce" font-size="12">1 : N</text><text x="665" y="294" fill="#9fb4ce" font-size="12">N : 1</text></g>
+          </svg></div>
+          <div class="schema-legend"><span><b>FKs:</b> ano, id_municipio, rede_id</span><span><b>Chave atual:</b> (ano, id_municipio, rede_id)</span><span><b>Atenção:</b> serie não é preservada</span></div>
+        </article>
+      </div>
+
+      <h3 style="margin-top:34px">Matriz de relacionamentos da constelação</h3><p class="section-intro">As dimensões são compartilhadas conforme o nível geográfico e o grão de cada fato. Fatos não devem ser unidos diretamente: a comparação deve ocorrer pelas dimensões conformadas e somente após compatibilizar a granularidade.</p>
+      <div style="overflow-x:auto"><table><thead><tr><th>Dimensão / chave</th><th>Relações 1:N</th><th>Observação de modelagem</th></tr></thead><tbody><tr><td><span class="key">PK</span><code>dim_tempo.ano</code></td><td><code>fato_aluno.ano</code>, <code>fato_indicador_municipio.ano</code>, <code>fato_indicador_uf.ano</code> e <code>fato_resultados.ano</code></td><td>Em <code>fato_meta</code>, a dimensão atua em dois papéis: <code>ano_referencia</code> e <code>ano_meta</code>.</td></tr><tr><td><span class="key">PK</span><code>dim_municipio.id_municipio</code></td><td><code>fato_aluno.id_municipio</code>, <code>fato_indicador_municipio.id_municipio</code> e <code>fato_resultados.id_municipio</code></td><td>Atributos de UF e região permanecem desnormalizados na dimensão, evitando snowflake nas análises municipais.</td></tr><tr><td><span class="key">PK</span><code>dim_uf.sigla_uf</code></td><td><code>fato_indicador_uf.sigla_uf</code></td><td>Usada pelo star estadual; não é necessário ligar <code>dim_municipio</code> a <code>dim_uf</code> no caminho analítico.</td></tr><tr><td><span class="key">PK</span><code>dim_rede.rede_id</code></td><td>Todas as fatos, após o mapeamento da rede</td><td>Deve existir exatamente um rótulo por <code>rede_id</code>; a unicidade precisa de assertion.</td></tr><tr><td><span class="key nk">NK</span><code>fato_meta.local_id</code></td><td><code>dim_municipio.id_municipio</code> quando nível = município; <code>dim_uf.sigla_uf</code> quando nível = UF</td><td>É uma chave polimórfica. Para integridade forte, recomenda-se separar as fatos de meta ou criar <code>dim_localidade</code>.</td></tr></tbody></table></div>
+      <h3 style="margin-top:34px">Grão e chave de negócio das fatos</h3><div style="overflow-x:auto"><table><thead><tr><th>Fato</th><th>Grão declarado</th><th>Chave de negócio</th></tr></thead><tbody><tr><td><code>fato_aluno</code></td><td>Um aluno em um ano de avaliação.</td><td><code>(ano, id_aluno)</code>; município e rede são FKs, enquanto aluno e escola funcionam como dimensões degeneradas.</td></tr><tr><td><code>fato_indicador_municipio</code></td><td>Um indicador por ano, município, rede e série.</td><td><code>(ano, id_municipio, rede_id, serie)</code>.</td></tr><tr><td><code>fato_indicador_uf</code></td><td>Um indicador por ano, UF, rede e série.</td><td><code>(ano, sigla_uf, rede_id, serie)</code>.</td></tr><tr><td><code>fato_meta</code></td><td>Uma versão de meta por nível, localidade, rede, ano de referência e ano-alvo.</td><td><code>(nivel_geografico, local_id, rede_id, ano_referencia, ano_meta)</code>.</td></tr><tr><td><code>fato_resultados</code></td><td>Um resultado municipal por ano, rede e série.</td><td>Recomendado: <code>(ano, id_municipio, rede_id, serie)</code>. Hoje o script remove <code>serie</code>; isso só é seguro enquanto a fonte contiver exclusivamente o 2º ano.</td></tr></tbody></table></div>
+      <h3 style="margin-top:34px">Boas práticas recomendadas para a Gold</h3><ol class="practice-list"><li><strong>Preservar o grão</strong>Incluir <code>serie</code> em <code>fato_resultados</code> ou filtrar explicitamente a série 2 antes da agregação.</li><li><strong>Não unir fatos diretamente</strong>Relacionar fatos por tempo, localidade e rede, agregando primeiro ao mesmo grão.</li><li><strong>Aplicar dimensões conformadas</strong>Reutilizar tempo, município, UF e rede com os mesmos significados em todos os marts.</li><li><strong>Modelar papéis do tempo</strong>Tratar ano de referência e ano da meta como duas FKs lógicas para <code>dim_tempo</code>.</li><li><strong>Eliminar chave polimórfica</strong>Substituir <code>local_id</code> por uma dimensão de localidade ou por fatos de meta separadas por nível.</li><li><strong>Separar núcleo e serving</strong>Manter apenas FKs e medidas na fato; expor nomes de município, UF, região e rede em uma view ampla para BI.</li><li><strong>Validar contratos</strong>Criar assertions de unicidade, não nulidade, integridade referencial e faixa para cada chave e medida.</li><li><strong>Preparar histórico</strong>Se atributos territoriais mudarem, adotar surrogate keys e SCD Tipo 2; os códigos naturais continuam como chaves de negócio.</li></ol>
+    </div></section>
+
+    <section id="qualidade"><div class="wrap"><div class="section-kicker">05 · Governança</div><h2>Qualidade incorporada ao pipeline</h2><p class="section-intro">As verificações acompanham a promoção da Silver e, para violações críticas, interrompem a execução antes que dados inconsistentes cheguem à camada analítica.</p><div class="grid-3"><article class="card quality-card"><h3>Estrutura</h3><p>Schema obrigatório, tipos e campos críticos são validados antes da escrita.</p></article><article class="card quality-card"><h3>Unicidade</h3><p>Duplicidades são medidas por chave natural antes e depois da deduplicação.</p></article><article class="card quality-card"><h3>Domínios</h3><p>UF, rede, série, caderno, booleanos e percentuais passam por regras explícitas.</p></article><article class="card quality-card"><h3>Coerência</h3><p>Presença, preenchimento, alfabetização, proficiência e peso são confrontados.</p></article><article class="card quality-card"><h3>Relacionamentos</h3><p>Chaves de município e rede sustentam os joins usados pela camada Gold.</p></article><article class="card quality-card"><h3>Rastreabilidade</h3><p>Fonte e timestamps registram quando o dado entrou e quando foi promovido.</p></article></div></div></section>
+
+    <section id="decisoes"><div class="wrap"><div class="section-kicker">06 · Trade-offs</div><h2>Decisões arquiteturais</h2><div class="grid-3"><article class="card tradeoff"><h3>Batch + streaming</h3><p>Batch processa históricos volumosos com eficiência; streaming entrega atualidade sem impor processamento contínuo ao conjunto inteiro.</p><span class="status">Implementado</span></article><article class="card tradeoff"><h3>Warehouse central</h3><p>BigQuery simplifica SQL, governança e consumo. O trade-off é maior acoplamento à GCP e ausência de uma cópia Parquet independente.</p><span class="status">Implementado</span></article><article class="card tradeoff"><h3>Full refresh</h3><p><code>overwrite</code> prioriza reprodutibilidade. Em maior escala, particionamento e cargas incrementais reduziriam bytes processados.</p><span class="status next">Próxima evolução</span></article></div></div></section>
+
+    <section id="finops"><div class="wrap"><div class="section-kicker">07 · Operação</div><h2>Monitoramento e FinOps</h2><p class="section-intro">A solução elimina capacidade ociosa onde possível e torna falhas visíveis. As escolhas privilegiam serviços gerenciados, execução sob demanda e granularidade de reprocessamento.</p><div class="grid-3"><article class="card finops"><div class="big">01</div><h3>Computação sob demanda</h3><p>Dataproc Serverless inicia recursos para o batch e os libera ao final, sem cluster permanente.</p></article><article class="card finops"><div class="big">02</div><h3>Menos processamento</h3><p>Views servem o streaming e a opção <code>--only</code> limita reprocessamentos ao conjunto necessário.</p></article><article class="card finops"><div class="big">03</div><h3>Falha observável</h3><p>Workflows consulta o estado do Dataproc, registra sucesso ou erro e propaga falhas críticas.</p></article></div><div class="note"><strong>Limite atual:</strong> orçamento formal, alertas de billing, dashboard operacional, notificações automáticas e estimativa financeira detalhada não estão versionados neste repositório. São os próximos controles recomendados para produção.</div></div></section>
+
+    <section id="ia"><div class="wrap"><div class="section-kicker">08 · Valor</div><h2>Da engenharia à inteligência</h2><p class="section-intro">A camada Gold organiza variáveis territoriais, temporais, educacionais e de metas em uma base adequada a análises estatísticas, dashboards e futuros produtos de IA.</p><div class="grid-3"><article class="card use-case"><div class="index">CASO 01</div><h3>Predição de alfabetização</h3><p>Projetar a taxa futura por município e rede e identificar antecipadamente risco de não atingir a meta.</p></article><article class="card use-case"><div class="index">CASO 02</div><h3>Desigualdade territorial</h3><p>Comparar municípios, UFs e regiões e formar clusters de vulnerabilidade educacional.</p></article><article class="card use-case"><div class="index">CASO 03</div><h3>Política pública</h3><p>Priorizar recursos, orientar intervenções e acompanhar resultados com indicadores reproduzíveis.</p></article></div><div class="note"><strong>Cuidado metodológico:</strong> futuros modelos devem separar treino e teste no tempo e usar somente informações disponíveis no momento da previsão, evitando vazamento de dados.</div></div></section>
+
+    <section id="entrega"><div class="wrap"><div class="section-kicker">09 · Repositório</div><h2>Uma entrega reproduzível</h2><p class="section-intro">Notebooks preservam a exploração original; scripts Python sustentam a execução produtiva; arquivos de infraestrutura descrevem ingestão, streaming e orquestração.</p><div class="repo-tree" aria-label="Estrutura resumida do repositório"><pre>tech-challenge-fase-2/
+├── definitions/       Dataform · Bronze
+├── notebooks/
+│   ├── silver/        exploração e tratamento
+│   └── gold/          modelagem analítica
+├── src/
+│   ├── common/        configuração, I/O e qualidade
+│   ├── silver/        6 pipelines de tratamento
+│   ├── gold/          9 dimensões e fatos
+│   └── run_pipeline.py
+├── orchestration/     Workflows + Scheduler
+├── streaming/         produtor Pub/Sub + views
+├── docs/              documentação técnica
+├── submit.sh          submissão Dataproc
+└── workflow_settings.yaml</pre></div><div class="grid-2" style="margin-top:24px"><article class="card"><h3>Execução modular</h3><p>O pipeline roda por inteiro, por camada ou por módulo. Essa granularidade apoia testes, correções e economia de processamento.</p></article><article class="card"><h3>Evolução registrada</h3><p>O histórico Git contém branches, Pull Requests e commits dedicados às camadas Gold, à orquestração, aos scripts e ao streaming.</p></article></div></div></section>
+  </main>
+  <footer><div class="wrap"><div><strong>Tech Challenge · Fase 2</strong><br>Pipeline Híbrida para Análise da Alfabetização no Brasil</div><div>Artur Costa · Davi Tolentino<br>Pós-graduação em AI Scientist · FIAP</div></div></footer>
+  <script>
+    document.querySelectorAll('[data-fact-tabs]').forEach((tabs) => {
+      const buttons = [...tabs.querySelectorAll('[role="tab"]')];
+      const panels = [...tabs.querySelectorAll('[role="tabpanel"]')];
+
+      const activate = (button, moveFocus = true) => {
+        buttons.forEach((item) => {
+          const selected = item === button;
+          item.setAttribute('aria-selected', String(selected));
+          item.tabIndex = selected ? 0 : -1;
+        });
+        panels.forEach((panel) => {
+          panel.hidden = panel.id !== button.getAttribute('aria-controls');
+        });
+        if (moveFocus) button.focus();
+      };
+
+      buttons.forEach((button, index) => {
+        button.addEventListener('click', () => activate(button, false));
+        button.addEventListener('keydown', (event) => {
+          if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+          event.preventDefault();
+          let next = index;
+          if (event.key === 'ArrowRight') next = (index + 1) % buttons.length;
+          if (event.key === 'ArrowLeft') next = (index - 1 + buttons.length) % buttons.length;
+          if (event.key === 'Home') next = 0;
+          if (event.key === 'End') next = buttons.length - 1;
+          activate(buttons[next]);
+        });
+      });
+    });
+  </script>
+</body>
+</html>

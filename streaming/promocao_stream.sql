@@ -2,9 +2,8 @@
 -- Diferente do batch (PySpark agendado), aqui usamos views: refletem cada evento
 -- novo na hora, sem job nem custo ocioso.
 
--- ============================================================
 -- SILVER: faz o parse do JSON cru da bronze de streaming em colunas tipadas
--- ============================================================
+
 CREATE OR REPLACE VIEW `tech-challenge-fase-2-505123.silver.medicoes_stream` AS
 SELECT
   JSON_VALUE(data, '$.evento_id')                          AS evento_id,
@@ -19,10 +18,9 @@ SELECT
   publish_time                                             AS _ingestao_stream
 FROM `tech-challenge-fase-2-505123.bronze.eventos_stream`;
 
--- ============================================================
+
 -- GOLD: última medição por município/rede/ano, enriquecida com a dim_municipio
 -- (a camada analítica recebendo o dado de streaming, ao vivo)
--- ============================================================
 CREATE OR REPLACE VIEW `tech-challenge-fase-2-505123.gold.indicador_stream_tempo_real` AS
 WITH ultima AS (
   SELECT *, ROW_NUMBER() OVER (
